@@ -47,18 +47,6 @@ module.exports = React.createClass({
 
 
   /*
-  * componentDidUpdate
-  *
-  * Invoked immediately after updating occurs.
-  * This method is not called for the initial render.
-  */
-
-  componentDidUpdate: function() {
-    this.refs.firstField.getDOMNode().focus();
-  },
-
-
-  /*
   * handleSubmit
   *
   * Handles the submit event for the form
@@ -366,7 +354,7 @@ module.exports = React.createClass({
                     <li>
                       <div className={pclass(['25-percent', 'left'])}>
                         <label>Key</label>
-                        <input  ref="firstField" type="text" name="key" />
+                        <input ref="firstField" type="text" name="key" />
                       </div>
 
                       <div className={pclass(['50-percent', 'left'])}>
