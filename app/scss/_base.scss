@@ -1,0 +1,15 @@
+#{$v}-help-link {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1;
+  color: $navy-lightest;
+  font-size: $basefont - 3;
+  text-decoration: none;
+  text-transform: uppercase;
+
+  &:hover {
+    text-decoration: underline;
+    color: $blue;
+  }
+}

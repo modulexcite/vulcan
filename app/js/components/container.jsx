@@ -367,13 +367,13 @@ module.exports = React.createClass({
     // compute classes for app body including show/hide
     var computeClasses = function(){
 
-      var classes = "";
+      var classes = "app-body";
+
       if (this.state.minimized) {
-        classes += "hide ";
+        classes += ", is-hidden ";
       }
 
-      classes += pclass("app-body");
-      return classes;
+      return pclass(classes);
 
     }.bind(this);
 
@@ -419,6 +419,8 @@ module.exports = React.createClass({
               );
             }
           }.bind(this)()}
+
+          <a className={pclass("help-link")} href="https://github.com/firebase/vulcan/issues" target="_blank">Report an Issue</a>
         </div>
 
 
