@@ -15,6 +15,52 @@ module.exports = React.createClass({
 
 
   /*
+  * getInitialState
+  *
+  * The return value will be used as the initial value of this.state
+  */
+
+  getInitialState: function() {
+    return {
+      url: this.getFirebaseURL()
+    };
+  },
+
+
+  /*
+  * setFirebaseURL
+  *
+  * Sets a Firebase URL to local storage
+  */
+
+  setFirebaseURL: function(url) {
+    var localStorageAvailable = this.hasLocalStorage();
+
+    if(localStorageAvailable) {
+      localStorage.setItem("firebaseURL", url);
+    }
+  },
+
+
+  /*
+  * getFirebaseURL
+  *
+  * Gets a Firebase URL that is saved to local storage
+  */
+
+  getFirebaseURL: function() {
+    var localStorageAvailable = this.hasLocalStorage();
+    var url = '';
+
+   if(localStorageAvailable) {
+      url = localStorage.getItem("firebaseURL");
+    }
+
+    return url;
+  },
+
+
+  /*
   * handleSubmit
   *
   * Handles the submit event for the form
@@ -28,6 +74,8 @@ module.exports = React.createClass({
     var pclass = this.prefixClass;
 
     if(urlIsValid) {
+      this.setFirebaseURL(url);
+
       this.props.onLogin({
         url: url,
         token: token
@@ -112,7 +160,7 @@ module.exports = React.createClass({
         <ul className={pclass(formClasses)}>
           <li>
             <label for="urlField" ref="urlLabel">Firebase URL</label>
-            <input id="urlField" ref="url" placeholder="https://yourapp.firebaseio.com" type="text" name="url" defaultValue={this.props.url}/>
+            <input id="urlField" ref="url" placeholder="https://yourapp.firebaseio.com" type="text" name="url" defaultValue={this.state.url}/>
           </li>
           <li>
             {this.renderAuthLabel()}
@@ -123,5 +171,13 @@ module.exports = React.createClass({
         <input type="submit" value="Sign In" className={pclass('button button-large button-primary')} />
       </form>
     )
+  },
+
+  hasLocalStorage: function() {
+    try {
+      return 'localStorage' in window && window['localStorage'] !== null;
+    } catch (e) {
+      return false;
+    }
   }
-})
+});
