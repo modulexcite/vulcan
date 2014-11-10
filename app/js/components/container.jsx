@@ -10,7 +10,8 @@ var AppMixins = require('./mixins');
 var errorMessages = {
   PERMISSION_DENIED: 'You do not have permission to edit data at this location.',
   PERMISSION_DENIED_READ: 'You do not have permission to view this Firebase.',
-  INVALID_TOKEN: 'The token you entered is not valid.'
+  INVALID_TOKEN: 'The token you entered is not valid.',
+  INVALID_JSON: 'The JSON you entered is not valid.'
 };
 
 /*

@@ -145,16 +145,28 @@ module.exports = React.createClass({
 
   saveJsonNode: function(form) {
     var key = form.key.value.trim();
-    var json = JSON.parse(form.json.value.trim());
+    var value = form.json.value.trim();
     var priority = this.cleanPriority(form.priority.value);
+    var isValidJSON = true;
 
-    if(json && key) {
-      this.state.firebaseRef.child(key).setWithPriority(json, priority, function(error) {
+    //CHECK IF JSON IS VALID
+    try {
+      JSON.parse(value);
+    } catch (e) {
+      isValidJSON = false;
+    }
+
+
+    if(isValidJSON && key) {
+      this.state.firebaseRef.child(key).setWithPriority(JSON.parse(value), priority, function(error) {
         if(error && error.code) {
           EventHub.publish('error', error.code);
         }
       });
       this.closeForm();
+    }
+    else {
+      EventHub.publish('error', 'INVALID_JSON');
     }
   },
 
