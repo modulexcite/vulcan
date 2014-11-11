@@ -13,18 +13,18 @@ module.exports = {
   * and returns a number, string, or null.
   */
 
-  cleanFormField: function(priority) {
-    priority = priority.trim();
+  cleanFormField: function(value) {
+    value = value.trim();
 
-    //If priority is a number, return a real number
-    if(!isNaN(priority) && priority !== '') {
-      priority = Number(priority);
+    //If value is a number, return a real number
+    if(!isNaN(value) && value !== '') {
+      value = Number(value);
     }
     else {
-      priority = priority || null;
+      value = value || null;
     }
 
-    return priority;
+    return value;
   },
 
 
