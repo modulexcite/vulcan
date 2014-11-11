@@ -86,7 +86,7 @@ module.exports = React.createClass({
   saveChildNode: function(form) {
     var key = form.key.value.trim();
     var value = form.value.value.trim();
-    var priority = this.cleanPriority(form.priority.value);
+    var priority = this.cleanFormField(this.cleanFormField(form.priority.value));
 
     if(value && key) {
       this.state.firebaseRef.child(key).setWithPriority(value, priority, function(error) {
@@ -109,8 +109,8 @@ module.exports = React.createClass({
     var parentPriority = form.parentPriority.value.trim() || null;
 
     var key = form.key.value.trim();
-    var value = form.value.value.trim();
-    var priority = this.cleanPriority(form.priority.value);
+    var value = this.cleanFormField(form.value.value.trim());
+    var priority = this.cleanFormField(form.priority.value);
 
     if(parentKey && key && value) {
       var childData = {};
@@ -146,7 +146,7 @@ module.exports = React.createClass({
   saveJsonNode: function(form) {
     var key = form.key.value.trim();
     var value = form.json.value.trim();
-    var priority = this.cleanPriority(form.priority.value);
+    var priority = this.cleanFormField(form.priority.value);
     var isValidJSON = true;
 
     //CHECK IF JSON IS VALID
@@ -178,8 +178,8 @@ module.exports = React.createClass({
   */
 
   updateNode: function(form) {
-    var priority = this.cleanPriority(form.priority.value);
-    var value = form.value.value.trim();
+    var priority = this.cleanFormField(form.priority.value);
+    var value = this.cleanFormField(form.value.value.trim());
 
     if(value !== undefined && value !== '') {
       this.state.firebaseRef.setWithPriority(value, priority, function(error) {
@@ -199,7 +199,7 @@ module.exports = React.createClass({
   */
 
   updatePriority: function(form){
-    var priority = this.cleanPriority(form.priority.value);
+    var priority = this.cleanFormField(form.priority.value);
 
     this.state.firebaseRef.setPriority(priority, function(error) {
       if(error && error.code) {
@@ -466,4 +466,3 @@ module.exports = React.createClass({
     )
   }
 });
-

@@ -7,13 +7,13 @@
 module.exports = {
 
   /*
-  * cleanPriority
+  * cleanFormField
   *
   * Takes the string value from a form field
   * and returns a number, string, or null.
   */
 
-  cleanPriority: function(priority) {
+  cleanFormField: function(priority) {
     priority = priority.trim();
 
     //If priority is a number, return a real number
