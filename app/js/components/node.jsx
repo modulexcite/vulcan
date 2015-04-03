@@ -13,6 +13,7 @@ var AppMixins = require('./mixins');
 */
 
 var Node = React.createClass({
+  DEFAULT_DISPLAY_NODES: 1000, // NODES TO DISPLAY IN UI
   UPDATE_BUFFER: 50, // ms
   mixins: [AppMixins],
   timeout: null,
@@ -72,6 +73,7 @@ var Node = React.createClass({
       hasChildren: false,
       numChildren: 0,
       children: [],
+      hiddenChildren: [],
       name: '',
       value: null,
       expanded: this.props.expandAll === true ? true : false,
@@ -328,8 +330,10 @@ var Node = React.createClass({
     this.updateTimeout = setTimeout(function() {
       options = options || {};
       var children = [];
+      var hiddenChildren = [];
       var expanded = (options.expanded !== undefined) ? options.expanded : this.state.expanded;
       var name = snapshot.name();
+      var numChildrenInSnapshot = snapshot.numChildren();
 
       //ROOT NODE ONLY
       if(this.props.root) {
@@ -353,16 +357,19 @@ var Node = React.createClass({
         // A CHILD NODE HAS BEEN DELETED
         if(this.state.numChildren > snapshot.numChildren()) {
           children = this.createChildren(this.state.snapshot, options);
+          hiddenChildren = this.createChildren(this.state.snapshot, options);
 
           //DELAY CHANGE FOR THE HIGHLIGHT
           setTimeout(function(){
             this.setState({
-              children: this.createChildren(snapshot, options)
+              children: this.createChildren(snapshot, options),
+              hiddenChildren: this.createChildren(snapshot, options)
             });
           }.bind(this), 1000);
         }
         else {
           children = this.createChildren(snapshot, options);
+          hiddenChildren = this.createChildren(snapshot, options);
         }
       }
 
@@ -372,6 +379,7 @@ var Node = React.createClass({
         hasChildren: snapshot.hasChildren(),
         numChildren: snapshot.numChildren(),
         children: children,
+        hiddenChildren: hiddenChildren,
         expanded: expanded,
         name: name,
         value: snapshot.val()
@@ -386,8 +394,10 @@ var Node = React.createClass({
   * Creates the child nodes for the current node
   */
 
-  createChildren: function(snapshot, options) {
+  createChildren: function(snapshot, options, offset) {
     options = options || {};
+    var numChildrenInSnapshot = snapshot.numChildren();
+    var numChildren = 0;
     var expandAll = options.expandAll || false;
     var collapseAll = options.collapseAll || false;
     var children = [];
@@ -411,11 +421,23 @@ var Node = React.createClass({
           collapseAll={collapseAll}
           onResetStatus={this.resetStatus}
           status={status}
-          priority={child.getPriority()}
-        />
+          priority={child.getPriority()} />
       );
 
       children.push(node);
+
+      numChildren = numChildren + 1;
+
+      // CANCEL FURTHER ENUMERATION
+      if (numChildren >= this.DEFAULT_DISPLAY_NODES) {
+        children.push((
+          <div onClick={this.displayNextNodes}>
+            {numChildrenInSnapshot - numChildren} more nodes...
+          </div>
+        ));
+        return true;
+      }
+
     }.bind(this));
 
     return children;
