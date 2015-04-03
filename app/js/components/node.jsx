@@ -539,7 +539,7 @@ var Node = React.createClass({
     var pclass = this.prefixClass;
 
     if(!this.state.name) {
-      nodeValue = <em className={pclass('value')}>Loading...</em>;
+      nodeValue = <em className={pclass('value')}>Loading... (this may take a while if you have a lot of data)</em>;
     }
     else if(isRoot && isNull) {
       nodeValue = <em className={pclass('value')}>null</em>;
