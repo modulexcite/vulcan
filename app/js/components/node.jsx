@@ -13,6 +13,7 @@ var AppMixins = require('./mixins');
 */
 
 var Node = React.createClass({
+  UPDATE_BUFFER: 50, // ms
   mixins: [AppMixins],
   timeout: null,
   updateTimeout: null,
@@ -375,7 +376,7 @@ var Node = React.createClass({
         name: name,
         value: snapshot.val()
       });
-    }.bind(this), 50);
+    }.bind(this), this.UPDATE_BUFFER);
   },
 
 
