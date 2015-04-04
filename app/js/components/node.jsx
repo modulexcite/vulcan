@@ -15,8 +15,6 @@ var AppMixins = require('./mixins');
 var Node = React.createClass({
   DEFAULT_DISPLAY_NODES: 1000,  // NODES TO DISPLAY IN UI
   UPDATE_BUFFER: 50,            // MILLISECONDS
-  numChildrenTotal: 0,
-  numChildrenShowing: 0,
   mixins: [AppMixins],
   timeout: null,
   updateTimeout: null,
@@ -332,7 +330,7 @@ var Node = React.createClass({
     this.updateTimeout = setTimeout(function() {
       options = options || {};
       var children = [];
-      var hiddenChildren = [];
+      var newChildrenState = {};
       var expanded = (options.expanded !== undefined) ? options.expanded : this.state.expanded;
       var name = snapshot.name();
       var numChildrenInSnapshot = snapshot.numChildren();
@@ -359,20 +357,19 @@ var Node = React.createClass({
         // A CHILD NODE HAS BEEN DELETED
         if(this.state.numChildren > snapshot.numChildren()) {
           children = this.createChildren(this.state.snapshot, options);
-          // TODO: CREATE THE HIDDEN CHILDREN
-          hiddenChildren = this.createChildren(this.state.snapshot, options);
+          newChildrenState = this.splitChildren(children);
 
           //DELAY CHANGE FOR THE HIGHLIGHT
           setTimeout(function(){
-            this.setState({
-              children: this.createChildren(snapshot, options),
-              hiddenChildren: this.createChildren(snapshot, options)
-            });
+            children = this.createChildren(snapshot, options);
+            newChildrenState = this.splitChildren(children);
+
+            this.setState(newChildrenState);
           }.bind(this), 1000);
         }
         else {
           children = this.createChildren(snapshot, options);
-          hiddenChildren = this.createChildren(snapshot, options);
+          newChildrenState = this.splitChildren(children);
         }
       }
 
@@ -381,8 +378,8 @@ var Node = React.createClass({
         snapshot: snapshot,
         hasChildren: snapshot.hasChildren(),
         numChildren: snapshot.numChildren(),
-        children: children,
-        hiddenChildren: hiddenChildren,
+        children: newChildrenState.children,
+        hiddenChildren: newChildrenState.hiddenChildren,
         expanded: expanded,
         name: name,
         value: snapshot.val()
@@ -403,8 +400,6 @@ var Node = React.createClass({
 
   createChildren: function(snapshot, options, numToRender, offset) {
     options = options || {};
-    var numChildrenInSnapshot = snapshot.numChildren();
-    var numChildren = 0;
     var expandAll = options.expandAll || false;
     var collapseAll = options.collapseAll || false;
     var children = [];
@@ -433,22 +428,20 @@ var Node = React.createClass({
 
       children.push(node);
 
-      numChildren = numChildren + 1;
-
-      if (numChildren >= this.DEFAULT_DISPLAY_NODES) {
-        // ADD MORE NODES NOTIFICATION AT END OF CHILDREN LIST
-        children.push(this.revealMoreNodesNotification(numChildrenInSnapshot, numChildren);
-
-        // CANCEL FURTHER ENUMERATION IN snapshot.forEach
-        return true;
-      }
-
     }.bind(this));
 
-    this.numChildrenShowing = this.numChildrenShowing + numChildren;
-    this.numChildrenTotal = snapshot.numChildren();
-
     return children;
+  },
+
+
+  splitChildren: function(children) {
+    var hiddenChildren = children.splice(this.DEFAULT_DISPLAY_NODES);
+    children = children.concat(this.revealMoreNodesNotification(hiddenChildren.length));
+
+    return {
+      children: children,
+      hiddenChildren: hiddenChildren
+    };
   },
 
 
@@ -459,6 +452,7 @@ var Node = React.createClass({
   */
 
   revealHiddenChildren: function() {
+    alert("LOL")
     // PULL OFF MORE NODES NOTIFICATION DUMMY CHILD
     var newChildren = this.state.children.slice(0, -1);
 
@@ -468,10 +462,10 @@ var Node = React.createClass({
 
     newChildren = newChildren
                     .concat(nextChildren)
-                    .concat(this.revealMoreNodesNotification());
+                    .concat(this.revealMoreNodesNotification(newHiddenChildren.length));
 
     this.setState({
-      children: newChildren
+      children: newChildren,
       hiddenChildren: newHiddenChildren
     });
   },
@@ -482,16 +476,16 @@ var Node = React.createClass({
   *
   * render a "x more nodes" notification at the end of a long list of data
   * @param {Number} numChildrenInSnapshot - number of children in a snapshot
-  * @param {Number} numChildrenDislpayed - number of children displayed in UI
+  * @param {Number} numChildrenDisplayed - number of children displayed in UI
   * @param {React DOM} - a "x more nodes" notification
   */
 
-  revealMoreNodesNotification: function(numChildrenInSnapshot, numChildrenDisplayed) {
+  revealMoreNodesNotification: function(numHiddenChildren) {
     return (
       <div onClick={this.revealHiddenChildren}>
-        {numChildrenInSnapshot - numChildrenDisplayed} more nodes...
+        {numHiddenChildren} more nodes...
       </div>
-    ):
+    );
   },
 
 
