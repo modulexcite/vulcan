@@ -13,8 +13,10 @@ var AppMixins = require('./mixins');
 */
 
 var Node = React.createClass({
-  DEFAULT_DISPLAY_NODES: 1000, // NODES TO DISPLAY IN UI
-  UPDATE_BUFFER: 50, // ms
+  DEFAULT_DISPLAY_NODES: 1000,  // NODES TO DISPLAY IN UI
+  UPDATE_BUFFER: 50,            // MILLISECONDS
+  numChildrenTotal: 0,
+  numChildrenShowing: 0,
   mixins: [AppMixins],
   timeout: null,
   updateTimeout: null,
@@ -357,6 +359,7 @@ var Node = React.createClass({
         // A CHILD NODE HAS BEEN DELETED
         if(this.state.numChildren > snapshot.numChildren()) {
           children = this.createChildren(this.state.snapshot, options);
+          // TODO: CREATE THE HIDDEN CHILDREN
           hiddenChildren = this.createChildren(this.state.snapshot, options);
 
           //DELAY CHANGE FOR THE HIGHLIGHT
@@ -392,9 +395,13 @@ var Node = React.createClass({
   * createChildren
   *
   * Creates the child nodes for the current node
+  * @param {Firebase Snapshot} snapshot - snapshot at a location
+  * @param {Object} options - display options
+  * @param
+  * @return {Array[React Nodes]} children - children to render
   */
 
-  createChildren: function(snapshot, options, offset) {
+  createChildren: function(snapshot, options, numToRender, offset) {
     options = options || {};
     var numChildrenInSnapshot = snapshot.numChildren();
     var numChildren = 0;
@@ -428,19 +435,63 @@ var Node = React.createClass({
 
       numChildren = numChildren + 1;
 
-      // CANCEL FURTHER ENUMERATION
       if (numChildren >= this.DEFAULT_DISPLAY_NODES) {
-        children.push((
-          <div onClick={this.displayNextNodes}>
-            {numChildrenInSnapshot - numChildren} more nodes...
-          </div>
-        ));
+        // ADD MORE NODES NOTIFICATION AT END OF CHILDREN LIST
+        children.push(this.revealMoreNodesNotification(numChildrenInSnapshot, numChildren);
+
+        // CANCEL FURTHER ENUMERATION IN snapshot.forEach
         return true;
       }
 
     }.bind(this));
 
+    this.numChildrenShowing = this.numChildrenShowing + numChildren;
+    this.numChildrenTotal = snapshot.numChildren();
+
     return children;
+  },
+
+
+  /*
+  * revealHiddenChildren
+  *
+  * take hidden children and add them to the UI
+  */
+
+  revealHiddenChildren: function() {
+    // PULL OFF MORE NODES NOTIFICATION DUMMY CHILD
+    var newChildren = this.state.children.slice(0, -1);
+
+    // COPY HIDDEN CHILDREN
+    var newHiddenChildren = this.state.hiddenChildren.slice();
+    var nextChildren = newHiddenChildren.splice(0, this.DEFAULT_DISPLAY_NODES);
+
+    newChildren = newChildren
+                    .concat(nextChildren)
+                    .concat(this.revealMoreNodesNotification());
+
+    this.setState({
+      children: newChildren
+      hiddenChildren: newHiddenChildren
+    });
+  },
+
+
+  /*
+  * revealMoreNodesNotification
+  *
+  * render a "x more nodes" notification at the end of a long list of data
+  * @param {Number} numChildrenInSnapshot - number of children in a snapshot
+  * @param {Number} numChildrenDislpayed - number of children displayed in UI
+  * @param {React DOM} - a "x more nodes" notification
+  */
+
+  revealMoreNodesNotification: function(numChildrenInSnapshot, numChildrenDisplayed) {
+    return (
+      <div onClick={this.revealHiddenChildren}>
+        {numChildrenInSnapshot - numChildrenDisplayed} more nodes...
+      </div>
+    ):
   },
 
 
