@@ -43,18 +43,18 @@ var Node = React.createClass({
       this.firstRender = false;
     },
     child_changed: function(snapshot, prevChildName) {
-      this.flags[snapshot.name()] = 'changed';
+      this.flags[snapshot.key()] = 'changed';
     },
     child_added: function(snapshot, previousName) {
       if(this.firstRender === false && this.state.expanded) {
-        this.flags[snapshot.name()] = 'added';
+        this.flags[snapshot.key()] = 'added';
       }
     },
     child_removed: function(snapshot) {
-      this.flags[snapshot.name()] = 'removed';
+      this.flags[snapshot.key()] = 'removed';
     },
     child_moved: function(snapshot, previousName) {
-      this.flags[snapshot.name()] = 'moved';
+      this.flags[snapshot.key()] = 'moved';
     }
   },
 
@@ -73,7 +73,7 @@ var Node = React.createClass({
       hasChildren: false,
       numChildren: 0,
       children: [],
-      hiddenChildren: [],
+      nodesShowing: this.DEFAULT_DISPLAY_NODES,
       name: '',
       value: null,
       expanded: this.props.expandAll === true ? true : false,
@@ -330,9 +330,8 @@ var Node = React.createClass({
     this.updateTimeout = setTimeout(function() {
       options = options || {};
       var children = [];
-      var newChildrenState = {};
       var expanded = (options.expanded !== undefined) ? options.expanded : this.state.expanded;
-      var name = snapshot.name();
+      var name = snapshot.key();
       var numChildrenInSnapshot = snapshot.numChildren();
 
       //ROOT NODE ONLY
@@ -357,19 +356,16 @@ var Node = React.createClass({
         // A CHILD NODE HAS BEEN DELETED
         if(this.state.numChildren > snapshot.numChildren()) {
           children = this.createChildren(this.state.snapshot, options);
-          newChildrenState = this.splitChildren(children);
 
           //DELAY CHANGE FOR THE HIGHLIGHT
           setTimeout(function(){
             children = this.createChildren(snapshot, options);
-            newChildrenState = this.splitChildren(children);
 
             this.setState(newChildrenState);
           }.bind(this), 1000);
         }
         else {
           children = this.createChildren(snapshot, options);
-          newChildrenState = this.splitChildren(children);
         }
       }
 
@@ -378,8 +374,7 @@ var Node = React.createClass({
         snapshot: snapshot,
         hasChildren: snapshot.hasChildren(),
         numChildren: snapshot.numChildren(),
-        children: newChildrenState.children,
-        hiddenChildren: newChildrenState.hiddenChildren,
+        children: children,
         expanded: expanded,
         name: name,
         value: snapshot.val()
@@ -408,15 +403,15 @@ var Node = React.createClass({
       var status = 'normal';
 
       //SEE IF NODE HAS A STATUS & DELETE FLAG
-      if(this.flags[child.name()]) {
-        status = this.flags[child.name()];
-        delete this.flags[child.name()];
+      if(this.flags[child.key()]) {
+        status = this.flags[child.key()];
+        delete this.flags[child.key()];
       }
 
       //CREATE A NODE
       var node = (
         <Node
-          key={child.name()}
+          key={child.key()}
           firebaseRef={child.ref()}
           snapshot={child}
           expandAll={expandAll}
@@ -434,43 +429,6 @@ var Node = React.createClass({
   },
 
 
-  splitChildren: function(children) {
-    var hiddenChildren = children.splice(this.DEFAULT_DISPLAY_NODES);
-    children = children.concat(this.revealMoreNodesNotification(hiddenChildren.length));
-
-    return {
-      children: children,
-      hiddenChildren: hiddenChildren
-    };
-  },
-
-
-  /*
-  * revealHiddenChildren
-  *
-  * take hidden children and add them to the UI
-  */
-
-  revealHiddenChildren: function() {
-    alert("LOL")
-    // PULL OFF MORE NODES NOTIFICATION DUMMY CHILD
-    var newChildren = this.state.children.slice(0, -1);
-
-    // COPY HIDDEN CHILDREN
-    var newHiddenChildren = this.state.hiddenChildren.slice();
-    var nextChildren = newHiddenChildren.splice(0, this.DEFAULT_DISPLAY_NODES);
-
-    newChildren = newChildren
-                    .concat(nextChildren)
-                    .concat(this.revealMoreNodesNotification(newHiddenChildren.length));
-
-    this.setState({
-      children: newChildren,
-      hiddenChildren: newHiddenChildren
-    });
-  },
-
-
   /*
   * revealMoreNodesNotification
   *
@@ -482,10 +440,23 @@ var Node = React.createClass({
 
   revealMoreNodesNotification: function(numHiddenChildren) {
     return (
-      <div onClick={this.revealHiddenChildren}>
+      <button onClick={this.showMoreNodes}>
         {numHiddenChildren} more nodes...
-      </div>
+      </button>
     );
+  },
+
+
+  showMoreNodes: function() {
+    var newNodesShowing = this.state.nodesShowing + this.DEFAULT_DISPLAY_NODES;
+
+    if (newNodesShowing > this.state.children.length) {
+      newNodesShowing = this.state.children.length;
+    }
+
+    this.setState({
+      nodesShowing: newNodesShowing
+    });
   },
 
 
@@ -579,11 +550,18 @@ var Node = React.createClass({
   renderChildren: function() {
     var children = {};
     var pclass = this.prefixClass;
+    var numNodesHidden = this.state.children.length - this.state.nodesShowing;
+    var nodesToShow = this.state.children.slice(0, this.state.nodesShowing);
+
+    // IF NODES ARE STILL HIDDEN, APPEND THE SHOW MORE NODES BUTTON
+    if (numNodesHidden > 0) {
+      nodesToShow.push(this.revealMoreNodesNotification(numNodesHidden));
+    }
 
     if(this.state.hasChildren && this.state.expanded) {
       children = (
         <ul className={pclass('child-list')}>
-          {this.state.children}
+          {nodesToShow}
         </ul>
       );
     }
