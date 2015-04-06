@@ -359,9 +359,9 @@ var Node = React.createClass({
 
           //DELAY CHANGE FOR THE HIGHLIGHT
           setTimeout(function(){
-            children = this.createChildren(snapshot, options);
-
-            this.setState(newChildrenState);
+            this.setState({
+              children: this.createChildren(snapshot, options)
+            });
           }.bind(this), 1000);
         }
         else {
@@ -389,11 +389,10 @@ var Node = React.createClass({
   * Creates the child nodes for the current node
   * @param {Firebase Snapshot} snapshot - snapshot at a location
   * @param {Object} options - display options
-  * @param
   * @return {Array[React Nodes]} children - children to render
   */
 
-  createChildren: function(snapshot, options, numToRender, offset) {
+  createChildren: function(snapshot, options) {
     options = options || {};
     var expandAll = options.expandAll || false;
     var collapseAll = options.collapseAll || false;
@@ -433,8 +432,7 @@ var Node = React.createClass({
   * revealMoreNodesNotification
   *
   * render a "x more nodes" notification at the end of a long list of data
-  * @param {Number} numChildrenInSnapshot - number of children in a snapshot
-  * @param {Number} numChildrenDisplayed - number of children displayed in UI
+  * @param {Number} numHiddenChildren - number of children not displayed
   * @param {React DOM} - a "x more nodes" notification
   */
 
@@ -448,6 +446,12 @@ var Node = React.createClass({
     );
   },
 
+
+  /*
+  * showMoreNodes
+  *
+  * update component state to indicate that DEFAULT_DISPLAY_NODES more nodes are showing
+  */
 
   showMoreNodes: function() {
     var newNodesShowing = this.state.nodesShowing + this.DEFAULT_DISPLAY_NODES;
