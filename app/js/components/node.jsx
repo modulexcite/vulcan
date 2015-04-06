@@ -439,8 +439,10 @@ var Node = React.createClass({
   */
 
   revealMoreNodesNotification: function(numHiddenChildren) {
+    var pclass = this.prefixClass;
+
     return (
-      <button onClick={this.showMoreNodes}>
+      <button className={pclass('button button-action')} onClick={this.showMoreNodes}>
         {numHiddenChildren} more nodes...
       </button>
     );
