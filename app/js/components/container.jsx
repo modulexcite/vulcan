@@ -1,5 +1,4 @@
 /** @jsx React.DOM */
-var Firebase = require('firebase');
 var React = require('react/addons');
 var AppHeader = require('./header');
 var Root = require('./root');
