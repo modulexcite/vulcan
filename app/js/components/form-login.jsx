@@ -1,6 +1,7 @@
 /** @jsx React.DOM */
 var React = require('react/addons');
 var AppMixins = require('./mixins');
+var $ = require('jquery');
 
 
 /*
@@ -13,6 +14,18 @@ var AppMixins = require('./mixins');
 module.exports = React.createClass({
   mixins: [AppMixins],
 
+  // sign in -> hit authentication backend
+  // if success
+  //   show pick firebases dropdown
+  //   pick a firebase ->
+  //     if is a firebase
+  //       show that firebase - END
+  //     if is "enter a Firebase URL"
+  //       show a firebase url input form
+  //
+  // if fail
+  //   show a failure message
+  //
 
   /*
   * getInitialState
@@ -22,8 +35,32 @@ module.exports = React.createClass({
 
   getInitialState: function() {
     return {
-      url: this.getFirebaseURL()
+      email: "test@example.com"
     };
+  },
+
+
+  /**
+   * login
+   *
+   * login a user to the Firebase servers
+   */
+
+  login: function(email, password, rememberMe) {
+    $.ajax({
+      url: "https://admin.firebase.com/account/login",
+      data: {
+        email: email,
+        password: password,
+        rememberMe: rememberMe
+      }
+    })
+    .done(function(response){
+      debugger;
+    })
+    .fail(function(){
+      debugger;
+    });
   },
 
 
@@ -33,13 +70,13 @@ module.exports = React.createClass({
   * Sets a Firebase URL to local storage
   */
 
-  setFirebaseURL: function(url) {
-    var localStorageAvailable = this.hasLocalStorage();
+  // setFirebaseURL: function(url) {
+  //   var localStorageAvailable = this.hasLocalStorage();
 
-    if(localStorageAvailable) {
-      localStorage.setItem("firebaseURL", url);
-    }
-  },
+  //   if(localStorageAvailable) {
+  //     localStorage.setItem("firebaseURL", url);
+  //   }
+  // },
 
 
   /*
@@ -48,16 +85,16 @@ module.exports = React.createClass({
   * Gets a Firebase URL that is saved to local storage
   */
 
-  getFirebaseURL: function() {
-    var localStorageAvailable = this.hasLocalStorage();
-    var url = '';
+  // getFirebaseURL: function() {
+  //   var localStorageAvailable = this.hasLocalStorage();
+  //   var url = '';
 
-   if(localStorageAvailable) {
-      url = localStorage.getItem("firebaseURL");
-    }
+  //  if(localStorageAvailable) {
+  //     url = localStorage.getItem("firebaseURL");
+  //   }
 
-    return url;
-  },
+  //   return url;
+  // },
 
 
   /*
@@ -67,23 +104,49 @@ module.exports = React.createClass({
   */
 
   handleSubmit: function(e) {
+    debugger;
     e.preventDefault();
-    var url = this.refs.url.getDOMNode().value.trim();
-    var urlIsValid = this.validateURL(url);
-    var token = this.refs.token.getDOMNode().value.trim();
+    var email = this.refs.email.getDOMNode().value.trim();
+    var password = this.refs.password.getDOMNode().value.trim();
     var pclass = this.prefixClass;
 
-    if(urlIsValid) {
-      this.setFirebaseURL(url);
+    var emailPasswordValidation = function(email, password) {
+      var errors = {
+        email: undefined,
+        password: undefined
+      };
 
-      this.props.onLogin({
-        url: url,
-        token: token
-      });
+      // VERY SIMPLE EMAIL / PW CHECK
+      if (email.indexOf('@') === -1) {
+        errors.email = true;
+      }
+      if (password.length === 0) {
+        errors.password = true;
+      }
+
+      return errors;
+    };
+
+    var errors = emailPasswordValidation(email, password);
+    var hasErrors = (errors.email || errors.password);
+
+    if (hasErrors) {
+      if (errors.email) {
+        this.refs.emailLabel.getDOMNode().innerHTML = 'Please enter a valid email address';
+        this.refs.emailLabel.getDOMNode().className = pclass('has-error');
+      }
+      if (errors.password) {
+        this.refs.passwordLabel.getDOMNode().innerHTML = 'Please enter a password';
+        this.refs.passwordLabel.getDOMNode().className = pclass('has-error');
+      }
     }
     else {
-      this.refs.urlLabel.getDOMNode().innerHTML = 'Please enter a valid Firebase URL';
-      this.refs.urlLabel.getDOMNode().className = pclass('has-error');
+      this.login(email, password, true);
+
+      // this.props.onLogin({
+      //   email: email,
+      //   password: password
+      // });
     }
   },
 
@@ -91,35 +154,35 @@ module.exports = React.createClass({
   /*
   * validateURL
   *
-  * Enforces that the URL is a firebase app url
+  * Enforces that the URL is a firebase app email
   */
 
-  validateURL: function(url) {
-    var isValid = false;
-    var isFirebaseURL = /^(https:\/\/)[a-zA-Z0-9-]+(.firebaseio.com)[\w\W]*/i;
+  // validateURL: function(email) {
+  //   var isValid = false;
+  //   var isFirebaseURL = /^(https:\/\/)[a-zA-Z0-9-]+(.firebaseio.com)[\w\W]*/i;
 
-    if(isFirebaseURL.test(url)) {
-      isValid = true;
-    }
+  //   if(isFirebaseURL.test(email)) {
+  //     isValid = true;
+  //   }
 
-    return isValid;
-  },
+  //   return isValid;
+  // },
 
 
   /*
   * renderAuthLabel
   *
-  * Renders the label for the authentication token field.
+  * Renders the label for the authentication password field.
   * This method also renders the error message for this field.
   */
 
   renderAuthLabel: function() {
     var pclass = this.prefixClass;
-    var label = <label for="tokenField" ref="tokenLabel">Authentication Token <em>(optional, <a target="_blank" href="https://www.firebase.com/docs/web/guide/simple-login/custom.html">more info</a>)</em></label>
+    var label = <label for="passwordField" ref="passwordLabel">Authentication Token <em>(optional, <a target="_blank" href="https://www.firebase.com/docs/web/guide/simple-login/custom.html">more info</a>)</em></label>
 
 
     if(this.props.authError) {
-      label = <label for="tokenField" ref="tokenLabel" className={pclass('has-error')}>The Authentication Token is Invalid</label>
+      label = <label for="passwordField" ref="passwordLabel" className={pclass('has-error')}>The Authentication Token is Invalid</label>
     }
 
     return label;
@@ -159,12 +222,12 @@ module.exports = React.createClass({
 
         <ul className={pclass(formClasses)}>
           <li>
-            <label for="urlField" ref="urlLabel">Firebase URL</label>
-            <input id="urlField" ref="url" placeholder="https://yourapp.firebaseio.com" type="text" name="url" defaultValue={this.state.url}/>
+            <label for="emailField" ref="emailLabel">Email</label>
+            <input id="emailField" ref="email" type="text" name="email" defaultValue={this.state.email}/>
           </li>
           <li>
-            {this.renderAuthLabel()}
-            <input id="tokenField"  ref="token" type="password" name="token"/>
+            <label for="passwordField" ref="passwordLabel">Password</label>
+            <input id="passwordField"  ref="password" type="password" name="password"/>
           </li>
         </ul>
 

@@ -13,7 +13,8 @@
     "128": "images/icon128.png"
   },
   "permissions": [
-    "storage"
+    "storage",
+    "https://*.firebase.com"
   ],
   "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
   "devtools_page": "devtools.html"
