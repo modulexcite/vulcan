@@ -34,7 +34,7 @@ module.exports = React.createClass({
   */
 
   getInitialState: function() {
-    var email = this.props.email || 'you@firebase.com';
+    var email = this.props.email || 'joey@firebase.com';
     var password = this.props.password || '';
 
     return {
