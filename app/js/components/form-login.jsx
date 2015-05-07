@@ -34,8 +34,12 @@ module.exports = React.createClass({
   */
 
   getInitialState: function() {
+    var email = this.props.email || 'you@firebase.com';
+    var password = this.props.password || '';
+
     return {
-      email: "test@example.com"
+      email: email,
+      password: password
     };
   },
 
@@ -47,20 +51,33 @@ module.exports = React.createClass({
    */
 
   login: function(email, password, rememberMe) {
-    $.ajax({
-      url: "https://admin.firebase.com/account/login",
+    return $.ajax({
+      url: 'https://admin.firebase.com/account/login',
       data: {
         email: email,
         password: password,
         rememberMe: rememberMe
       }
-    })
-    .done(function(response){
-      debugger;
-    })
-    .fail(function(){
-      debugger;
     });
+  },
+
+  setAdminToken: function(adminToken){
+    var localStorageAvailable = this.hasLocalStorage();
+
+    if (localStorageAvailable) {
+      localStorage.setItem('adminToken', adminToken);
+    }
+  },
+
+  getAdminToken: function(){
+    var localStorageAvailable = this.hasLocalStorage();
+    var adminToken = '';
+
+    if (localStorageAvailable) {
+      adminToken = localStorage.getItem('adminToken');
+    }
+
+    return adminToken;
   },
 
 
@@ -104,8 +121,8 @@ module.exports = React.createClass({
   */
 
   handleSubmit: function(e) {
-    debugger;
     e.preventDefault();
+    var self = this;
     var email = this.refs.email.getDOMNode().value.trim();
     var password = this.refs.password.getDOMNode().value.trim();
     var pclass = this.prefixClass;
@@ -131,6 +148,8 @@ module.exports = React.createClass({
     var hasErrors = (errors.email || errors.password);
 
     if (hasErrors) {
+
+      // DISPLAY ANY ERROR MESSAGES
       if (errors.email) {
         this.refs.emailLabel.getDOMNode().innerHTML = 'Please enter a valid email address';
         this.refs.emailLabel.getDOMNode().className = pclass('has-error');
@@ -139,14 +158,25 @@ module.exports = React.createClass({
         this.refs.passwordLabel.getDOMNode().innerHTML = 'Please enter a password';
         this.refs.passwordLabel.getDOMNode().className = pclass('has-error');
       }
+
     }
     else {
-      this.login(email, password, true);
 
-      // this.props.onLogin({
-      //   email: email,
-      //   password: password
-      // });
+      // // LOGIN TO FIREBASE SERVERS
+      // this.login(email, password, true)
+      //   .done(function(response){
+      //     debugger;
+      //   })
+      //   .fail(function(){
+      //     // SHOW AN ERROR MESSAGE
+      //     self.refs.emailLabel.getDOMNode().innerHTML = 'The username or password you entered was incorrect';
+      //     self.refs.emailLabel.getDOMNode().className = pclass('has-error');
+      //   });
+
+      this.props.onLogin({
+        email: email,
+        password: password
+      });
     }
   },
 

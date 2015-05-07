@@ -1,10 +1,13 @@
 /** @jsx React.DOM */
+var $ = require('jquery');
+
 var Firebase = require('firebase');
 var React = require('react/addons');
 var AppHeader = require('./header');
 var Root = require('./root');
 var LoginForm = require('./form-login');
 var EditForm = require('./form-edit');
+var SelectFirebase = require('./form-selectfirebase');
 var EventHub = require('./eventhub');
 var AppMixins = require('./mixins');
 
@@ -174,18 +177,69 @@ module.exports = React.createClass({
   */
 
   login: function(data) {
-    //CLEAR ERROR MESSAGES
+    var self = this;
+
+    // CLEAR ERROR MESSAGES
     this.setState({loginAuthError: null});
 
-    var firebase = new Firebase(data.url);
-    var token = data.token || this.state.token;
+    // MAKE LOGIN REQUEST
+    $.ajax({
+      url: 'https://admin.firebase.com/account/login',
+      data: {
+        email: data.email,
+        password: data.password,
+        rememberMe: true
+      }
+    })
+    .done(function(response){
+      var adminToken = response.adminToken;
+      self._setAdminToken(adminToken);
 
-    //AUTHENTICATE
-    if(token) {
-      this.authenticate(firebase, token, data.url);
+      self.setState({
+        adminToken: adminToken
+      })
+    })
+    .fail(function(){
+      // TODO: HANDLE FAILURES
+    });
+
+
+    // // AUTHENTICATE
+    // if (token) {
+    //   this.authenticate(firebase, token, data.url);
+    // }
+    // else {
+    //   this.setState({
+    //     url: data.url,
+    //     firebaseRef: firebase
+    //   });
+    // }
+  },
+
+  _setAdminToken: function(adminToken){
+    var localStorageAvailable = this._hasLocalStorage();
+
+    if (localStorageAvailable) {
+      localStorage.setItem('adminToken', adminToken);
     }
-    else {
-      this.setState({url: data.url, firebaseRef: firebase});
+  },
+
+  _getAdminToken: function(){
+    var localStorageAvailable = this._hasLocalStorage();
+    var adminToken = '';
+
+    if (localStorageAvailable) {
+      adminToken = localStorage.getItem('adminToken');
+    }
+
+    return adminToken;
+  },
+
+  _hasLocalStorage: function() {
+    try {
+      return 'localStorage' in window && window['localStorage'] !== null;
+    } catch (e) {
+      return false;
     }
   },
 
@@ -409,8 +463,11 @@ module.exports = React.createClass({
           {this.renderErrorMessage()}
 
           {function(){
-            if(this.state.firebaseRef) {
+            if (this.state.firebaseRef) {
               return <Root firebaseRef={this.state.firebaseRef} />
+            }
+            else if (this.state.adminToken) {
+              return <SelectFirebase adminToken={this.state.adminToken} />
             }
             else {
               return (
