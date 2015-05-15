@@ -14,7 +14,7 @@ var AppMixins = require('./mixins');
 
 var Node = React.createClass({
   DEFAULT_DISPLAY_NODES: 1000,  // NODES TO DISPLAY IN UI
-  UPDATE_BUFFER: 50,            // MILLISECONDS
+  UPDATE_DEBOUNCE: 50,          // MILLISECONDS
   mixins: [AppMixins],
   timeout: null,
   updateTimeout: null,
@@ -73,7 +73,7 @@ var Node = React.createClass({
       hasChildren: false,
       numChildren: 0,
       children: [],
-      nodesShowing: this.DEFAULT_DISPLAY_NODES,
+      numNodesShowing: this.DEFAULT_DISPLAY_NODES,
       name: '',
       value: null,
       expanded: this.props.expandAll === true ? true : false,
@@ -379,7 +379,7 @@ var Node = React.createClass({
         name: name,
         value: snapshot.val()
       });
-    }.bind(this), this.UPDATE_BUFFER);
+    }.bind(this), this.UPDATE_DEBOUNCE);
   },
 
 
@@ -438,10 +438,18 @@ var Node = React.createClass({
 
   revealMoreNodesNotification: function(numHiddenChildren) {
     var pclass = this.prefixClass;
+    var message;
+
+    if (numHiddenChildren > this.DEFAULT_DISPLAY_NODES) {
+      message = "Show next " + this.DEFAULT_DISPLAY_NODES + " of " + numHiddenChildren + " remaining nodes...";
+    }
+    else {
+      message = "Show remaining " + numHiddenChildren + " nodes...";
+    }
 
     return (
       <button className={pclass('button button-action')} onClick={this.showMoreNodes}>
-        {numHiddenChildren} more nodes...
+        {message}
       </button>
     );
   },
@@ -454,14 +462,14 @@ var Node = React.createClass({
   */
 
   showMoreNodes: function() {
-    var newNodesShowing = this.state.nodesShowing + this.DEFAULT_DISPLAY_NODES;
+    var newNodesShowing = this.state.numNodesShowing + this.DEFAULT_DISPLAY_NODES;
 
     if (newNodesShowing > this.state.children.length) {
       newNodesShowing = this.state.children.length;
     }
 
     this.setState({
-      nodesShowing: newNodesShowing
+      numNodesShowing: newNodesShowing
     });
   },
 
@@ -556,8 +564,8 @@ var Node = React.createClass({
   renderChildren: function() {
     var children = {};
     var pclass = this.prefixClass;
-    var numNodesHidden = this.state.children.length - this.state.nodesShowing;
-    var nodesToShow = this.state.children.slice(0, this.state.nodesShowing);
+    var numNodesHidden = this.state.children.length - this.state.numNodesShowing;
+    var nodesToShow = this.state.children.slice(0, this.state.numNodesShowing);
 
     // IF NODES ARE STILL HIDDEN, APPEND THE SHOW MORE NODES BUTTON
     if (numNodesHidden > 0) {
