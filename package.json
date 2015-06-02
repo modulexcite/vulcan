@@ -24,8 +24,6 @@
     "grunt-contrib-watch": "~0.5.2",
     "grunt-react": "~0.6.0",
     "grunt-sass": "^0.10.0",
-    "load-grunt-tasks": "~0.3.0",
-    "firebase": "2.2.3",
-    "react": "^0.11.1"
+    "load-grunt-tasks": "~0.3.0"
   }
 }
