@@ -108,7 +108,7 @@ module.exports = function(grunt) {
         files: [{
           expand: true,
           cwd: 'production',
-          src: ['js/**/*.js', 'css/vulcan.css', 'images/**/*.{png,jpg,gif}', '!images/promo/**/*', '!index.html'],
+          src: ['js/**/*.js', 'bower_components/**/*', 'css/vulcan.css', 'images/**/*.{png,jpg,gif}', '!images/promo/**/*', '!index.html'],
           dest: 'chrome-extension/panes'
         }]
       }
