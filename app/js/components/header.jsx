@@ -77,6 +77,19 @@ module.exports = React.createClass({
 
 
   /*
+  * changeFirebase
+  *
+  * Logs out of the current Firebase URL Ref and takes
+  * the user to the Vulcan start screen
+  */
+
+  changeFirebase: function(e) {
+    e.preventDefault();
+    this.props.onHeaderAction({type: 'changeFirebase'});
+  },
+
+
+  /*
   * logout
   *
   * Logs out of the current Firebase URL Ref and takes
@@ -176,6 +189,7 @@ module.exports = React.createClass({
                           }.bind(this)()}
                           <li><a href="#" onClick={this.expand}>Expand All</a></li>
                           <li><a href="#" onClick={this.collapse}>Collapse All</a></li>
+                          <li><a href="#" onClick={this.changeFirebase}>Change Firebase</a></li>
                           <li><a href="#" onClick={this.logout}>Logout</a></li>
                         </ul>
                       )

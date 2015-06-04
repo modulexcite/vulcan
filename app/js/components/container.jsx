@@ -245,6 +245,28 @@ module.exports = React.createClass({
 
 
   /*
+  * changeFirebase
+  *
+  * Log a user out of the current Firebase and return them
+  * to the login screen.
+  */
+
+  changeFirebase: function() {
+    //UNAUTHENTICATE
+    this.state.firebaseRef.unauth();
+
+    this.setState({
+      formAction: null,
+      node: null,
+      status: 'new',
+      firebaseRef: null,
+      url: '',
+      token: ''
+    });
+  },
+
+
+  /*
   * logout
   *
   * Log a user out of the current Firebase and return them
@@ -256,6 +278,7 @@ module.exports = React.createClass({
     this.state.firebaseRef.unauth();
 
     this.setState({
+      adminToken: '',
       formAction: null,
       node: null,
       status: 'new',
@@ -377,11 +400,12 @@ module.exports = React.createClass({
 
   headerAction: function(action) {
     switch(action.type) {
-      case 'minimize':  this.minimize();                 break;
-      case 'collapse':  this.collapseAll();              break;
-      case 'expand':    this.expandAll();                break;
-      case 'logout':    this.logout();                   break;
-      case 'url':       this.changeURL(action);          break;
+      case 'minimize': this.minimize(); break;
+      case 'collapse': this.collapseAll(); break;
+      case 'expand': this.expandAll(); break;
+      case 'changeFirebase': this.changeFirebase(); break;
+      case 'logout': this.logout(); break;
+      case 'url': this.changeURL(action); break;
     }
   },
 
