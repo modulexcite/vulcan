@@ -1,8 +1,4 @@
 /** @jsx React.DOM */
-var React = require('react/addons');
-var AppMixins = require('./mixins');
-var $ = require('jquery');
-
 
 /*
 * LOGIN FORM COMPONENT
@@ -11,21 +7,29 @@ var $ = require('jquery');
 * to enter a Firebase URL and an Auth Token (optional)
 */
 
+var React = require('react/addons');
+var AppMixins = require('./mixins');
+var $ = require('jquery');
+
 module.exports = React.createClass({
   mixins: [AppMixins],
 
-  // sign in -> hit authentication backend
-  // if success
-  //   show pick firebases dropdown
-  //   pick a firebase ->
-  //     if is a firebase
-  //       show that firebase - END
-  //     if is "enter a Firebase URL"
-  //       show a firebase url input form
-  //
-  // if fail
-  //   show a failure message
-  //
+  /*
+   THINGS TO DO HERE:
+
+   sign in -> hit authentication backend
+   if success
+     show pick firebases dropdown
+     pick a firebase ->
+       if is a firebase
+         show that firebase - END
+       if is "enter a Firebase URL"
+         show a firebase url input form
+
+   if fail
+     show a failure message
+
+  */
 
   /*
   * getInitialState

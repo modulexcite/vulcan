@@ -3,7 +3,6 @@ var React = require('react/addons');
 var AppMixins = require('./mixins');
 var $ = require('jquery');
 
-
 /*
 * LOGIN FORM COMPONENT
 *
@@ -16,12 +15,14 @@ module.exports = React.createClass({
 
   getInitialState: function() {
     return {
+      selectedNamespace: '',
       firebases: []
-    }
+    };
   },
 
   componentDidMount: function() {
     var self = this;
+
     // HIT THE ADMIN ENDPOINT TO GET THE ADMIN TOKENS FOR EACH FIREBASE
     var getTokensForFirebases = function(accountData){
       var namespaces = accountData.firebases;
@@ -44,7 +45,7 @@ module.exports = React.createClass({
         });
 
         $.ajax({
-          url: "https://admin.firebase.com/firebase/" + namespace + "/token?token=" + self.props.adminToken + "&namespace=" + namespace
+          url: 'https://admin.firebase.com/firebase/' + namespace + '/token?token=' + self.props.adminToken + '&namespace=' + namespace
         })
         .then(resolveRequest);
 
@@ -68,7 +69,7 @@ module.exports = React.createClass({
         var personalToken = tokenPayload.tokenData.personalToken;
 
         $.ajax({
-          url: "https://" + namespace + ".firebaseio.com/.settings/secrets.json?auth=" + personalToken
+          url: 'https://' + namespace + '.firebaseio.com/.settings/secrets.json?auth=' + personalToken
         }).then(function(secretData){
           request.resolve({
             namespace: namespace,
@@ -96,7 +97,7 @@ module.exports = React.createClass({
 
     // KICK OFF REQUESTS AND ULTIMATELY POST MESSAGE BACK TO APP CODE WITH FIREBASES / SECRETS
     $.ajax({
-      url: "https://admin.firebase.com/account?token=" + self.props.adminToken
+      url: 'https://admin.firebase.com/account?token=' + self.props.adminToken
     })
     .then(getTokensForFirebases)
     .then(getSecretsForFirebases)
@@ -104,10 +105,76 @@ module.exports = React.createClass({
   },
 
   /*
+  * _renderSelector
+  *
+  * renders either a loading message or a selector
+  */
+
+  _renderSelector: function() {
+    var pclass = this.prefixClass;
+    var cx = React.addons.classSet;
+    var elem;
+
+    var formClasses = cx({
+      'form-fields': true,
+      'l-stacked': true,
+      'form-fields-large': !this.props.isDevTools
+    });
+
+    if (this.state.firebases.length === 0) {
+      elem = (
+        <h2>Loading your Firebases...</h2>
+      );
+    }
+    else {
+      elem = (
+        <ul className={pclass(formClasses)}>
+          <li>
+            <select name='firebase-picker' ref='firebasePicker' onChange={this.updateSelectedFirebase}>
+              {this.state.firebases.map(function(firebase){
+                return <option value={firebase.namespace}>{firebase.namespace}</option>
+              })}
+              <option value='url'>Enter a Firebase URL</option>
+            </select>
+          </li>
+        </ul>
+      );
+    }
+
+    return elem;
+  },
+
+
+  /**
+   * updateSelectedFirebase
+   *
+   * set the state of the component with the selected Firebase namespace
+   */
+
+  updateSelectedFirebase: function(e) {
+    var selectedNamespace = e.target.value;
+
+    this.setState({
+      selectedNamespace: selectedNamespace
+    });
+  },
+
+
+  /**
+   * showFirebase
+   *
+   * take the user to the data view
+   */
+
+  showFirebase: function(e) {
+    e.preventDefault();
+    this.props.selectFirebase(this.state.selectedNamespace);
+  },
+
+  /*
   * render
   *
-  * When called, it should examine this.props and
-  * this.state and return a single child component.
+  * render the select firebase form
   */
 
   render: function() {
@@ -121,31 +188,16 @@ module.exports = React.createClass({
       'is-devtools': this.props.isDevTools
     });
 
-    var formClasses = cx({
-      'form-fields': true,
-      'l-stacked': true,
-      'form-fields-large': !this.props.isDevTools
-    });
-
 
     return  (
-      <form onSubmit={this.handleSubmit} className={pclass(classes)}>
-        <img className={pclass('logo-image')} src="images/vulcan-logo.png" />
+      <form onSubmit={this.showFirebase} className={pclass(classes)}>
+        <img className={pclass('logo-image')} src='images/vulcan-logo.png' />
         <h2 className={pclass('title')}>Vulcan</h2>
         <p className={pclass('sub-title')}>Firebase Data Inspector</p>
 
-        <ul className={pclass(formClasses)}>
-          <li>
-            <select name="firebase-picker" ref="firebasePicker">
-              {this.state.firebases.map(function(firebase){
-                return <option value="{firebase.namespace}">{firebase.namespace}</option>
-              })}
-              <option value="url">Enter a Firebase URL</option>
-            </select>
-          </li>
-        </ul>
+        {this._renderSelector()}
 
-        <input type="submit" value="View Data" className={pclass('button button-large button-primary')} />
+        <input type='submit' value='View Data' className={pclass('button button-large button-primary')} />
       </form>
     )
   },

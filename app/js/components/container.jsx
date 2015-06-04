@@ -43,7 +43,7 @@ module.exports = React.createClass({
       left: false,
       right: true,
       bottom: true
-    }
+    };
 
     // Pin to all 4 sides for dev tools
     if(isDevTools) {
@@ -52,7 +52,7 @@ module.exports = React.createClass({
         left: true,
         right: true,
         bottom: true
-      }
+      };
     }
 
     return {
@@ -197,7 +197,7 @@ module.exports = React.createClass({
 
       self.setState({
         adminToken: adminToken
-      })
+      });
     })
     .fail(function(){
       // TODO: HANDLE FAILURES
@@ -443,6 +443,14 @@ module.exports = React.createClass({
       this.setState(newState);
     }.bind(this);
 
+    var selectFirebase = function(namespace) {
+      var ref = new Firebase('https://' + namespace + '.firebaseio.com');
+
+      this.setState({
+        firebaseRef: ref
+      });
+    }.bind(this);
+
     //OPTIONS FOR PINNING STATE
     var classes = cx({
       'l-pinned-top': this.state.pinned.top,
@@ -467,7 +475,7 @@ module.exports = React.createClass({
               return <Root firebaseRef={this.state.firebaseRef} />
             }
             else if (this.state.adminToken) {
-              return <SelectFirebase adminToken={this.state.adminToken} />
+              return <SelectFirebase adminToken={this.state.adminToken} selectFirebase={selectFirebase}/>
             }
             else {
               return (
