@@ -13,6 +13,8 @@ var AppMixins = require('./mixins');
 */
 
 var Node = React.createClass({
+  DEFAULT_DISPLAY_NODES: 1000,  // NODES TO DISPLAY IN UI
+  UPDATE_DEBOUNCE: 50,          // MILLISECONDS
   mixins: [AppMixins],
   timeout: null,
   updateTimeout: null,
@@ -41,18 +43,18 @@ var Node = React.createClass({
       this.firstRender = false;
     },
     child_changed: function(snapshot, prevChildName) {
-      this.flags[snapshot.name()] = 'changed';
+      this.flags[snapshot.key()] = 'changed';
     },
     child_added: function(snapshot, previousName) {
       if(this.firstRender === false && this.state.expanded) {
-        this.flags[snapshot.name()] = 'added';
+        this.flags[snapshot.key()] = 'added';
       }
     },
     child_removed: function(snapshot) {
-      this.flags[snapshot.name()] = 'removed';
+      this.flags[snapshot.key()] = 'removed';
     },
     child_moved: function(snapshot, previousName) {
-      this.flags[snapshot.name()] = 'moved';
+      this.flags[snapshot.key()] = 'moved';
     }
   },
 
@@ -71,6 +73,7 @@ var Node = React.createClass({
       hasChildren: false,
       numChildren: 0,
       children: [],
+      numNodesShowing: this.DEFAULT_DISPLAY_NODES,
       name: '',
       value: null,
       expanded: this.props.expandAll === true ? true : false,
@@ -328,7 +331,8 @@ var Node = React.createClass({
       options = options || {};
       var children = [];
       var expanded = (options.expanded !== undefined) ? options.expanded : this.state.expanded;
-      var name = snapshot.name();
+      var name = snapshot.key();
+      var numChildrenInSnapshot = snapshot.numChildren();
 
       //ROOT NODE ONLY
       if(this.props.root) {
@@ -375,7 +379,7 @@ var Node = React.createClass({
         name: name,
         value: snapshot.val()
       });
-    }.bind(this), 50);
+    }.bind(this), this.UPDATE_DEBOUNCE);
   },
 
 
@@ -383,6 +387,9 @@ var Node = React.createClass({
   * createChildren
   *
   * Creates the child nodes for the current node
+  * @param {Firebase Snapshot} snapshot - snapshot at a location
+  * @param {Object} options - display options
+  * @return {Array[React Nodes]} children - children to render
   */
 
   createChildren: function(snapshot, options) {
@@ -395,29 +402,75 @@ var Node = React.createClass({
       var status = 'normal';
 
       //SEE IF NODE HAS A STATUS & DELETE FLAG
-      if(this.flags[child.name()]) {
-        status = this.flags[child.name()];
-        delete this.flags[child.name()];
+      if(this.flags[child.key()]) {
+        status = this.flags[child.key()];
+        delete this.flags[child.key()];
       }
 
       //CREATE A NODE
       var node = (
         <Node
-          key={child.name()}
+          key={child.key()}
           firebaseRef={child.ref()}
           snapshot={child}
           expandAll={expandAll}
           collapseAll={collapseAll}
           onResetStatus={this.resetStatus}
           status={status}
-          priority={child.getPriority()}
-        />
+          priority={child.getPriority()} />
       );
 
       children.push(node);
+
     }.bind(this));
 
     return children;
+  },
+
+
+  /*
+  * revealMoreNodesNotification
+  *
+  * render a "x more nodes" notification at the end of a long list of data
+  * @param {Number} numHiddenChildren - number of children not displayed
+  * @param {React DOM} - a "x more nodes" notification
+  */
+
+  revealMoreNodesNotification: function(numHiddenChildren) {
+    var pclass = this.prefixClass;
+    var message;
+
+    if (numHiddenChildren > this.DEFAULT_DISPLAY_NODES) {
+      message = "Show next " + this.DEFAULT_DISPLAY_NODES + " of " + numHiddenChildren + " remaining nodes...";
+    }
+    else {
+      message = "Show remaining " + numHiddenChildren + " nodes...";
+    }
+
+    return (
+      <button className={pclass('button button-action')} onClick={this.showMoreNodes}>
+        {message}
+      </button>
+    );
+  },
+
+
+  /*
+  * showMoreNodes
+  *
+  * update component state to indicate that DEFAULT_DISPLAY_NODES more nodes are showing
+  */
+
+  showMoreNodes: function() {
+    var newNodesShowing = this.state.numNodesShowing + this.DEFAULT_DISPLAY_NODES;
+
+    if (newNodesShowing > this.state.children.length) {
+      newNodesShowing = this.state.children.length;
+    }
+
+    this.setState({
+      numNodesShowing: newNodesShowing
+    });
   },
 
 
@@ -511,11 +564,18 @@ var Node = React.createClass({
   renderChildren: function() {
     var children = {};
     var pclass = this.prefixClass;
+    var numNodesHidden = this.state.children.length - this.state.numNodesShowing;
+    var nodesToShow = this.state.children.slice(0, this.state.numNodesShowing);
+
+    // IF NODES ARE STILL HIDDEN, APPEND THE SHOW MORE NODES BUTTON
+    if (numNodesHidden > 0) {
+      nodesToShow.push(this.revealMoreNodesNotification(numNodesHidden));
+    }
 
     if(this.state.hasChildren && this.state.expanded) {
       children = (
         <ul className={pclass('child-list')}>
-          {this.state.children}
+          {nodesToShow}
         </ul>
       );
     }
@@ -538,7 +598,7 @@ var Node = React.createClass({
     var pclass = this.prefixClass;
 
     if(!this.state.name) {
-      nodeValue = <em className={pclass('value')}>Loading...</em>;
+      nodeValue = <em className={pclass('value')}>Loading... (this may take a while if you have a lot of data)</em>;
     }
     else if(isRoot && isNull) {
       nodeValue = <em className={pclass('value')}>null</em>;
