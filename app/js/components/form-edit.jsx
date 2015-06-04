@@ -86,7 +86,7 @@ module.exports = React.createClass({
   saveChildNode: function(form) {
     var key = form.key.value.trim();
     var value = form.value.value.trim();
-    var priority = this.cleanFormField(this.cleanFormField(form.priority.value));
+    var priority = this.cleanFormField(form.priority.value);
 
     if(value && key) {
       this.state.firebaseRef.child(key).setWithPriority(value, priority, function(error) {
