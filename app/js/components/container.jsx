@@ -34,8 +34,11 @@ module.exports = React.createClass({
   */
 
   getInitialState: function() {
-    //Check if running Vulcan in Chrome Dev Tools Panel
+    // CHECK IF RUNNING VULCAN IN CHROME DEV TOOLS PANEL
     var isDevTools = (this.props.options && this.props.options.isDevTools) ? true: false;
+
+    // GET THE ADMIN TOKEN IF IT EXISTS
+    var adminToken = this._getAdminToken();
 
     // Default pinning options
     var pinnedOptions = {
@@ -56,6 +59,7 @@ module.exports = React.createClass({
     }
 
     return {
+      adminToken: adminToken,
       status: 'new',
       firebaseRef: null,
       url: '',
@@ -276,6 +280,9 @@ module.exports = React.createClass({
   logout: function() {
     //UNAUTHENTICATE
     this.state.firebaseRef.unauth();
+
+    // CLEAR THE ADMIN TOKEN LOCALLY
+    this._setAdminToken('');
 
     this.setState({
       adminToken: '',
