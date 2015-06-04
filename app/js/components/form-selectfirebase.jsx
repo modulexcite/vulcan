@@ -88,9 +88,11 @@ module.exports = React.createClass({
     // TAKE THE FIREBASES / SECRETS AND SET THE LOGIN FORM STATE WITH THEM
     var listFirebasesForLogin = function() {
       var firebasesAndSecrets = Array.prototype.slice.call(arguments);
+      var firstNamespaceListed = firebasesAndSecrets[0].namespace;
       // POST RESULTS BACK TO CONNECTION
       self.setState({
-        firebases: firebasesAndSecrets
+        firebases: firebasesAndSecrets,
+        selectedNamespace: firstNamespaceListed
       });
     };
 

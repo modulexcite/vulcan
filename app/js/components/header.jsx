@@ -18,7 +18,9 @@ module.exports = React.createClass({
   */
 
   getInitialState: function() {
-    return {showDropdown: this.props.showDropdown};
+    return {
+      showDropdown: this.props.showDropdown
+    };
   },
 
 
@@ -30,7 +32,9 @@ module.exports = React.createClass({
   */
 
   componentWillReceiveProps: function() {
-    this.setState({showDropdown: this.props.showDropdown});
+    this.setState({
+      showDropdown: this.props.showDropdown
+    });
   },
 
 
@@ -98,7 +102,7 @@ module.exports = React.createClass({
       // toggle state
       this.props.setStateOfParent("minimized", !this.props.checkStateOfParent("minimized"));
     } else {
-      this.setState({showDropdown: !this.state.showDropdown})
+      this.setState({showDropdown: !this.state.showDropdown});
     }
   },
 

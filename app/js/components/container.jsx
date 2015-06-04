@@ -444,11 +444,14 @@ module.exports = React.createClass({
     }.bind(this);
 
     var selectFirebase = function(namespace) {
-      var ref = new Firebase('https://' + namespace + '.firebaseio.com');
+      var url = 'https://' + namespace + '.firebaseio.com';
+      var ref = new Firebase(url);
 
       this.setState({
+        url: url,
         firebaseRef: ref
       });
+
     }.bind(this);
 
     //OPTIONS FOR PINNING STATE
@@ -465,7 +468,12 @@ module.exports = React.createClass({
 
     return (
       <div className={pclass(classes)}>
-        <AppHeader onHeaderAction={this.headerAction} isDevTools={this.state.isDevTools} url={this.state.url} showDropdown={false} checkStateOfParent={checkStateOfParent} setStateOfParent={setStateOfParent} />
+        <AppHeader onHeaderAction={this.headerAction}
+                   isDevTools={this.state.isDevTools}
+                   url={this.state.url}
+                   showDropdown={false}
+                   checkStateOfParent={checkStateOfParent}
+                   setStateOfParent={setStateOfParent} />
 
         <div className={computeClasses()} ref="appBody">
           {this.renderErrorMessage()}
