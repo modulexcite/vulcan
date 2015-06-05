@@ -123,6 +123,17 @@ module.exports = React.createClass({
       'form-fields-large': !this.props.isDevTools
     });
 
+    var styles = {
+      firebasePicker: {
+        height: '35px',
+        width: '100%'
+      },
+      firebaseOption: {
+        fontSize: '24px',
+        lineHeight: '35px'
+      }
+    };
+
     if (this.state.firebases.length === 0) {
       elem = (
         <h2>Loading your Firebases...</h2>
@@ -132,12 +143,14 @@ module.exports = React.createClass({
       elem = (
         <ul className={pclass(formClasses)}>
           <li>
-            <select name='firebase-picker' ref='firebasePicker' onChange={this.updateSelectedFirebase}>
+            <h2 style={styles.selectHeader}>Select a Firebase app to view</h2>
+            <select style={styles.firebasePicker} name='firebase-picker' ref='firebasePicker' onChange={this.updateSelectedFirebase}>
               {this.state.firebases.map(function(firebase){
-                return <option value={firebase.namespace}>{firebase.namespace}</option>
+                return <option style={styles.firebaseOption} value={firebase.namespace}>{firebase.namespace}</option>
               })}
               <option value='url'>Enter a Firebase URL</option>
             </select>
+            <input type='submit' value='View Data' className={pclass('button button-large button-primary')} />
           </li>
         </ul>
       );
@@ -183,6 +196,12 @@ module.exports = React.createClass({
     var pclass = this.prefixClass;
     var cx = React.addons.classSet;
 
+    var styles = {
+      selectContainer: {
+        margin: '0 auto',
+        width: '300px'
+      }
+    }
 
     //OPTIONS FOR PINNING STATE
     var classes = cx({
@@ -197,9 +216,9 @@ module.exports = React.createClass({
         <h2 className={pclass('title')}>Vulcan</h2>
         <p className={pclass('sub-title')}>Firebase Data Inspector</p>
 
-        {this._renderSelector()}
-
-        <input type='submit' value='View Data' className={pclass('button button-large button-primary')} />
+        <div style={styles.selectContainer}>
+          {this._renderSelector()}
+        </div>
       </form>
     )
   },
