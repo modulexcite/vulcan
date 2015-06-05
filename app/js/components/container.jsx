@@ -160,7 +160,7 @@ module.exports = React.createClass({
       status: 'new',
       firebaseRef: null,
       url: '',
-      token: '',
+      adminToken: '',
       formAction: null,
       node: null,
       loginAuthError: '',
@@ -264,8 +264,7 @@ module.exports = React.createClass({
       node: null,
       status: 'new',
       firebaseRef: null,
-      url: '',
-      token: ''
+      url: ''
     });
   },
 
@@ -279,7 +278,9 @@ module.exports = React.createClass({
 
   logout: function() {
     //UNAUTHENTICATE
-    this.state.firebaseRef.unauth();
+    if (this.state.firebaseRef) {
+      this.state.firebaseRef.unauth();
+    }
 
     // CLEAR THE ADMIN TOKEN LOCALLY
     this._setAdminToken('');
@@ -290,8 +291,7 @@ module.exports = React.createClass({
       node: null,
       status: 'new',
       firebaseRef: null,
-      url: '',
-      token: ''
+      url: ''
     });
   },
 
@@ -310,7 +310,7 @@ module.exports = React.createClass({
       else {
         this.setState({
           url: url,
-          token: token,
+          adminToken: token,
           firebaseRef: firebase
         });
       }
@@ -385,7 +385,6 @@ module.exports = React.createClass({
       status: 'new',
       firebaseRef: null,
       url: '',
-      token: '',
       error: ''
     },
     function() {

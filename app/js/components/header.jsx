@@ -142,7 +142,6 @@ module.exports = React.createClass({
   },
 
 
-
   _renderIfSelectingNamespace: function(elem) {
     if (!this.props.url) {
       elem = '';
@@ -203,15 +202,19 @@ module.exports = React.createClass({
                             )
                           }
                         }.bind(this)()}
+
                         {this._renderIfSelectingNamespace(
                           <li><a href="#" onClick={this.expand}>Expand All</a></li>
                         )}
+
                         {this._renderIfSelectingNamespace(
                           <li><a href="#" onClick={this.collapse}>Collapse All</a></li>
                         )}
+
                         {this._renderIfSelectingNamespace(
                           <li><a href="#" onClick={this.changeFirebase}>Change Firebase</a></li>
                         )}
+
                         <li><a href="#" onClick={this.logout}>Logout</a></li>
                       </ul>
                     )
