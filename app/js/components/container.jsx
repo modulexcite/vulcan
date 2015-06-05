@@ -14,6 +14,7 @@ var AppMixins = require('./mixins');
 var errorMessages = {
   PERMISSION_DENIED: 'You do not have permission to edit data at this location.',
   PERMISSION_DENIED_READ: 'You do not have permission to view this Firebase.',
+  LOGIN_FAILED: 'The username or password you entered was incorrect.',
   INVALID_TOKEN: 'The token you entered is not valid.',
   INVALID_JSON: 'The JSON you entered is not valid.'
 };
@@ -200,11 +201,12 @@ module.exports = React.createClass({
       self._setAdminToken(adminToken);
 
       self.setState({
-        adminToken: adminToken
+        adminToken: adminToken,
+        error: ''
       });
     })
     .fail(function(){
-      // TODO: HANDLE FAILURES
+      self.showError(null, 'LOGIN_FAILED');
     });
 
 
