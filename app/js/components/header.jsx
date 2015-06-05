@@ -142,6 +142,16 @@ module.exports = React.createClass({
   },
 
 
+
+  _renderIfSelectingNamespace: function(elem) {
+    if (!this.props.url) {
+      elem = '';
+    }
+
+    return elem;
+  },
+
+
   /*
   * render
   *
@@ -167,41 +177,49 @@ module.exports = React.createClass({
         </div>
 
         {function(){
-          if(this.props.url) {
-            return (
-              <form onSubmit={this.handleSubmit}>
-                <input className={pclass("toolbar-url")} type="text" defaultValue={this.props.url} ref="url" />
+          return (
+            <form onSubmit={this.handleSubmit}>
 
-                <div className={pclass('toolbar-end')} onClick={this.toggleDropdown}>
-                  <a href="#" className={pclass('toolbar-arrow')}></a>
+              {function() {
+                if (this.props.url) {
+                  return (
+                    <input className={pclass("toolbar-url")} type="text" defaultValue={this.props.url} ref="url" />
+                  );
+                }
+              }.bind(this)()}
 
-                  {function(){
-                    if(this.state.showDropdown) {
-                      return (
-                        <ul className={pclass('dropdown')}>
-                          {function(){
-                            // if not in dev tools, show minimize option
-                            if (!this.props.isDevTools) {
-                              return (
-                                <li><a href="#" onClick={this.minimize}>Minimize</a></li>
-                              )
-                            }
-                          }.bind(this)()}
+              <div className={pclass('toolbar-end')} onClick={this.toggleDropdown}>
+                <a href="#" className={pclass('toolbar-arrow')}></a>
+
+                {function(){
+                  if(this.state.showDropdown) {
+                    return (
+                      <ul className={pclass('dropdown')}>
+                        {function(){
+                          // if not in dev tools, show minimize option
+                          if (!this.props.isDevTools) {
+                            return (
+                              <li><a href="#" onClick={this.minimize}>Minimize</a></li>
+                            )
+                          }
+                        }.bind(this)()}
+                        {this._renderIfSelectingNamespace(
                           <li><a href="#" onClick={this.expand}>Expand All</a></li>
+                        )}
+                        {this._renderIfSelectingNamespace(
                           <li><a href="#" onClick={this.collapse}>Collapse All</a></li>
+                        )}
+                        {this._renderIfSelectingNamespace(
                           <li><a href="#" onClick={this.changeFirebase}>Change Firebase</a></li>
-                          <li><a href="#" onClick={this.logout}>Logout</a></li>
-                        </ul>
-                      )
-                    }
-                  }.bind(this)()}
-                </div>
-              </form>
-            )
-          }
-          else {
-            //show alt here
-          }
+                        )}
+                        <li><a href="#" onClick={this.logout}>Logout</a></li>
+                      </ul>
+                    )
+                  }
+                }.bind(this)()}
+              </div>
+            </form>
+          )
         }.bind(this)()}
       </div>
     )

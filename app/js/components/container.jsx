@@ -500,6 +500,7 @@ module.exports = React.createClass({
     return (
       <div className={pclass(classes)}>
         <AppHeader onHeaderAction={this.headerAction}
+                   adminToken={this.state.adminToken}
                    isDevTools={this.state.isDevTools}
                    url={this.state.url}
                    showDropdown={false}
