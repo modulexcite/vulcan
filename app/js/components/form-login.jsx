@@ -12,39 +12,35 @@ var AppMixins = require('./mixins');
 var $ = require('jquery');
 
 module.exports = React.createClass({
+
+  isLocalStorageAvailable: false,
   mixins: [AppMixins],
 
-  /*
-   THINGS TO DO HERE:
-
-   sign in -> hit authentication backend
-   if success
-     show pick firebases dropdown
-     pick a firebase ->
-       if is a firebase
-         show that firebase - END
-       if is "enter a Firebase URL"
-         show a firebase url input form
-
-   if fail
-     show a failure message
-
-  */
-
-  /*
-  * getInitialState
-  *
-  * The return value will be used as the initial value of this.state
-  */
+  /**
+   * getInitialState
+   *
+   * The return value will be used as the initial value of this.state
+   */
 
   getInitialState: function() {
-    var email = this.props.email || 'joey@firebase.com';
+    var email = this.props.email || '';
     var password = this.props.password || '';
 
     return {
       email: email,
       password: password
     };
+  },
+
+
+  /**
+   * componentDidMount
+   *
+   * check to see if client has localStorage
+   */
+
+  componentDidMount: function() {
+    this.isLocalStorageAvailable = this.checkForLocalStorage();
   },
 
 
@@ -66,18 +62,15 @@ module.exports = React.createClass({
   },
 
   setAdminToken: function(adminToken){
-    var localStorageAvailable = this.hasLocalStorage();
-
-    if (localStorageAvailable) {
+    if (this.isLocalStorageAvailable) {
       localStorage.setItem('adminToken', adminToken);
     }
   },
 
   getAdminToken: function(){
-    var localStorageAvailable = this.hasLocalStorage();
     var adminToken = '';
 
-    if (localStorageAvailable) {
+    if (this.isLocalStorageAvailable) {
       adminToken = localStorage.getItem('adminToken');
     }
 
@@ -85,44 +78,11 @@ module.exports = React.createClass({
   },
 
 
-  /*
-  * setFirebaseURL
-  *
-  * Sets a Firebase URL to local storage
-  */
-
-  // setFirebaseURL: function(url) {
-  //   var localStorageAvailable = this.hasLocalStorage();
-
-  //   if(localStorageAvailable) {
-  //     localStorage.setItem("firebaseURL", url);
-  //   }
-  // },
-
-
-  /*
-  * getFirebaseURL
-  *
-  * Gets a Firebase URL that is saved to local storage
-  */
-
-  // getFirebaseURL: function() {
-  //   var localStorageAvailable = this.hasLocalStorage();
-  //   var url = '';
-
-  //  if(localStorageAvailable) {
-  //     url = localStorage.getItem("firebaseURL");
-  //   }
-
-  //   return url;
-  // },
-
-
-  /*
-  * handleSubmit
-  *
-  * Handles the submit event for the form
-  */
+  /**
+   * handleSubmit
+   *
+   * Handles the submit event for the form
+   */
 
   handleSubmit: function(e) {
     e.preventDefault();
@@ -165,18 +125,6 @@ module.exports = React.createClass({
 
     }
     else {
-
-      // // LOGIN TO FIREBASE SERVERS
-      // this.login(email, password, true)
-      //   .done(function(response){
-      //     debugger;
-      //   })
-      //   .fail(function(){
-      //     // SHOW AN ERROR MESSAGE
-      //     self.refs.emailLabel.getDOMNode().innerHTML = 'The username or password you entered was incorrect';
-      //     self.refs.emailLabel.getDOMNode().className = pclass('has-error');
-      //   });
-
       this.props.onLogin({
         email: email,
         password: password
@@ -185,37 +133,18 @@ module.exports = React.createClass({
   },
 
 
-  /*
-  * validateURL
-  *
-  * Enforces that the URL is a firebase app email
-  */
-
-  // validateURL: function(email) {
-  //   var isValid = false;
-  //   var isFirebaseURL = /^(https:\/\/)[a-zA-Z0-9-]+(.firebaseio.com)[\w\W]*/i;
-
-  //   if(isFirebaseURL.test(email)) {
-  //     isValid = true;
-  //   }
-
-  //   return isValid;
-  // },
-
-
-  /*
-  * renderAuthLabel
-  *
-  * Renders the label for the authentication password field.
-  * This method also renders the error message for this field.
-  */
+  /**
+   * renderAuthLabel
+   *
+   * Renders the label for the authentication password field.
+   * This method also renders the error message for this field.
+   */
 
   renderAuthLabel: function() {
     var pclass = this.prefixClass;
     var label = <label for="passwordField" ref="passwordLabel">Authentication Token <em>(optional, <a target="_blank" href="https://www.firebase.com/docs/web/guide/simple-login/custom.html">more info</a>)</em></label>
 
-
-    if(this.props.authError) {
+    if (this.props.authError) {
       label = <label for="passwordField" ref="passwordLabel" className={pclass('has-error')}>The Authentication Token is Invalid</label>
     }
 
@@ -223,12 +152,12 @@ module.exports = React.createClass({
   },
 
 
-  /*
-  * render
-  *
-  * When called, it should examine this.props and
-  * this.state and return a single child component.
-  */
+  /**
+   * render
+   *
+   * When called, it should examine this.props and
+   * this.state and return a single child component.
+   */
 
   render: function() {
     var pclass = this.prefixClass;
@@ -270,7 +199,7 @@ module.exports = React.createClass({
     )
   },
 
-  hasLocalStorage: function() {
+  checkForLocalStorage: function() {
     try {
       return 'localStorage' in window && window['localStorage'] !== null;
     } catch (e) {
