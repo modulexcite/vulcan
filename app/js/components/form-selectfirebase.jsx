@@ -125,8 +125,7 @@ module.exports = React.createClass({
 
     var styles = {
       firebasePicker: {
-        height: '35px',
-        width: '100%'
+        height: '35px'
       },
       firebaseOption: {
         fontSize: '24px',
@@ -136,23 +135,29 @@ module.exports = React.createClass({
 
     if (this.state.firebases.length === 0) {
       elem = (
-        <h2>Loading your Firebases...</h2>
+        <ul className={pclass(formClasses)}>
+          <li>
+            <label style={styles.loading}>Loading your Firebase apps...</label>
+          </li>
+        </ul>
       );
     }
     else {
       elem = (
-        <ul className={pclass(formClasses)}>
-          <li>
-            <h2 style={styles.selectHeader}>Select a Firebase app to view</h2>
-            <select style={styles.firebasePicker} name='firebase-picker' ref='firebasePicker' onChange={this.updateSelectedFirebase}>
-              {this.state.firebases.map(function(firebase){
-                return <option style={styles.firebaseOption} value={firebase.namespace}>{firebase.namespace}</option>
-              })}
-              <option value='url'>Enter a Firebase URL</option>
-            </select>
-            <input type='submit' value='View Data' className={pclass('button button-large button-primary')} />
-          </li>
-        </ul>
+        <div>
+          <ul className={pclass(formClasses)}>
+            <li>
+              <label for='firebase-picker' style={styles.selectHeader}>Select a Firebase app to view:</label>
+              <select id='firebase-picker' style={styles.firebasePicker} name='firebase-picker' ref='firebasePicker' onChange={this.updateSelectedFirebase}>
+                {this.state.firebases.map(function(firebase){
+                  return <option style={styles.firebaseOption} value={firebase.namespace}>{firebase.namespace}</option>
+                })}
+                <option value='url'>Enter a Firebase URL</option>
+              </select>
+            </li>
+          </ul>
+          <input type='submit' value='View Data' className={pclass('button button-large button-primary')} />
+        </div>
       );
     }
 

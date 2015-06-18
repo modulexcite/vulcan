@@ -212,7 +212,7 @@ module.exports = React.createClass({
                         )}
 
                         {this._renderIfSelectingNamespace(
-                          <li><a href="#" onClick={this.changeFirebase}>Change Firebase</a></li>
+                          <li><a href="#" onClick={this.changeFirebase}>Change Firebase App</a></li>
                         )}
 
                         <li><a href="#" onClick={this.logout}>Logout</a></li>
