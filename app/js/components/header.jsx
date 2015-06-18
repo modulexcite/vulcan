@@ -142,15 +142,6 @@ module.exports = React.createClass({
   },
 
 
-  _renderIfSelectingNamespace: function(elem) {
-    if (!this.props.url) {
-      elem = '';
-    }
-
-    return elem;
-  },
-
-
   /*
   * render
   *
@@ -203,19 +194,21 @@ module.exports = React.createClass({
                           }
                         }.bind(this)()}
 
-                        {this._renderIfSelectingNamespace(
+                        {this._renderIfViewingNamespace(
                           <li><a href="#" onClick={this.expand}>Expand All</a></li>
                         )}
 
-                        {this._renderIfSelectingNamespace(
+                        {this._renderIfViewingNamespace(
                           <li><a href="#" onClick={this.collapse}>Collapse All</a></li>
                         )}
 
-                        {this._renderIfSelectingNamespace(
+                        {this._renderIfViewingNamespace(
                           <li><a href="#" onClick={this.changeFirebase}>Change Firebase App</a></li>
                         )}
 
-                        <li><a href="#" onClick={this.logout}>Logout</a></li>
+                        {this._renderIfLoggedIn(
+                          <li><a href="#" onClick={this.logout}>Logout</a></li>
+                        )}
                       </ul>
                     )
                   }
@@ -226,5 +219,35 @@ module.exports = React.createClass({
         }.bind(this)()}
       </div>
     )
+  },
+
+
+  /**
+   * _renderIfViewingNamespace
+   *
+   * conditionally render element if user is viewing a namespace
+   */
+
+  _renderIfViewingNamespace: function(elem) {
+    if (!this.props.url) {
+      elem = '';
+    }
+
+    return elem;
+  },
+
+
+  /**
+   * _renderIfLoggedIn
+   *
+   * conditionally render element if user is logged in
+   */
+
+  _renderIfLoggedIn: function(elem){
+    if (!this.props.adminToken) {
+      elem = '';
+    }
+
+    return elem;
   }
 });

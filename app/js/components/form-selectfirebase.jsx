@@ -11,7 +11,9 @@ var $ = require('jquery');
 */
 
 module.exports = React.createClass({
+
   mixins: [AppMixins],
+
 
   getInitialState: function() {
     return {
@@ -19,6 +21,7 @@ module.exports = React.createClass({
       firebases: []
     };
   },
+
 
   componentDidMount: function() {
     var self = this;
@@ -106,11 +109,12 @@ module.exports = React.createClass({
     .then(listFirebasesForLogin);
   },
 
-  /*
-  * _renderSelector
-  *
-  * renders either a loading message or a selector
-  */
+
+  /**
+   * _renderSelector
+   *
+   * renders either a loading message or a selector
+   */
 
   _renderSelector: function() {
     var pclass = this.prefixClass;
@@ -123,21 +127,11 @@ module.exports = React.createClass({
       'form-fields-large': !this.props.isDevTools
     });
 
-    var styles = {
-      firebasePicker: {
-        height: '35px'
-      },
-      firebaseOption: {
-        fontSize: '24px',
-        lineHeight: '35px'
-      }
-    };
-
     if (this.state.firebases.length === 0) {
       elem = (
         <ul className={pclass(formClasses)}>
           <li>
-            <label style={styles.loading}>Loading your Firebase apps...</label>
+            <label>Loading your Firebase apps...</label>
           </li>
         </ul>
       );
@@ -147,12 +141,11 @@ module.exports = React.createClass({
         <div>
           <ul className={pclass(formClasses)}>
             <li>
-              <label for='firebase-picker' style={styles.selectHeader}>Select a Firebase app to view:</label>
-              <select id='firebase-picker' style={styles.firebasePicker} name='firebase-picker' ref='firebasePicker' onChange={this.updateSelectedFirebase}>
+              <label for='firebase-picker'>Select a Firebase app to view:</label>
+              <select id='firebase-picker' name='firebase-picker' ref='firebasePicker' onChange={this.updateSelectedFirebase}>
                 {this.state.firebases.map(function(firebase){
-                  return <option style={styles.firebaseOption} value={firebase.namespace}>{firebase.namespace}</option>
+                  return <option value={firebase.namespace}>{firebase.namespace}</option>
                 })}
-                <option value='url'>Enter a Firebase URL</option>
               </select>
             </li>
           </ul>
@@ -191,11 +184,12 @@ module.exports = React.createClass({
     this.props.selectFirebase(this.state.selectedNamespace);
   },
 
-  /*
-  * render
-  *
-  * render the select firebase form
-  */
+
+  /**
+   * render
+   *
+   * render the select firebase form
+   */
 
   render: function() {
     var pclass = this.prefixClass;
