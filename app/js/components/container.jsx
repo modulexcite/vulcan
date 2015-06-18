@@ -208,18 +208,6 @@ module.exports = React.createClass({
     .fail(function(){
       self.showError(null, 'LOGIN_FAILED');
     });
-
-
-    // // AUTHENTICATE
-    // if (token) {
-    //   this.authenticate(firebase, token, data.url);
-    // }
-    // else {
-    //   this.setState({
-    //     url: data.url,
-    //     firebaseRef: firebase
-    //   });
-    // }
   },
 
   _setAdminToken: function(adminToken){
