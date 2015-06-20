@@ -142,7 +142,7 @@ module.exports = React.createClass({
   */
 
   hideError: function(e) {
-    if(e && e.preventDefault) {
+    if (e && e.preventDefault) {
       e.preventDefault();
     }
 
@@ -161,14 +161,13 @@ module.exports = React.createClass({
       status: 'new',
       firebaseRef: null,
       url: '',
-      adminToken: '',
       formAction: null,
       node: null,
       loginAuthError: '',
       minimized: false,
     });
 
-    if(error && error === 'PERMISSION_DENIED') {
+    if (error && error === 'PERMISSION_DENIED') {
       this.showError(null, 'PERMISSION_DENIED_READ');
     }
   },
