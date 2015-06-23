@@ -111,54 +111,6 @@ module.exports = React.createClass({
 
 
   /**
-   * _renderSelector
-   *
-   * renders either a loading message or a selector
-   */
-
-  _renderSelector: function() {
-    var pclass = this.prefixClass;
-    var cx = React.addons.classSet;
-    var elem;
-
-    var formClasses = cx({
-      'form-fields': true,
-      'l-stacked': true,
-      'form-fields-large': !this.props.isDevTools
-    });
-
-    if (this.state.firebases.length === 0) {
-      elem = (
-        <ul className={pclass(formClasses)}>
-          <li>
-            <label>Loading your Firebase apps...</label>
-          </li>
-        </ul>
-      );
-    }
-    else {
-      elem = (
-        <div>
-          <ul className={pclass(formClasses)}>
-            <li>
-              <label for='firebase-picker'>Select a Firebase app to view:</label>
-              <select id='firebase-picker' name='firebase-picker' ref='firebasePicker' onChange={this.updateSelectedFirebase}>
-                {this.state.firebases.map(function(firebase){
-                  return <option value={firebase.namespace}>{firebase.namespace}</option>
-                })}
-              </select>
-            </li>
-          </ul>
-          <input type='submit' value='View Data' className={pclass('button button-large button-primary')} />
-        </div>
-      );
-    }
-
-    return elem;
-  },
-
-
-  /**
    * updateSelectedFirebase
    *
    * set the state of the component with the selected Firebase namespace
@@ -200,14 +152,13 @@ module.exports = React.createClass({
         margin: '0 auto',
         width: '300px'
       }
-    }
+    };
 
     //OPTIONS FOR PINNING STATE
     var classes = cx({
       'login-form': true,
       'is-devtools': this.props.isDevTools
     });
-
 
     return  (
       <form onSubmit={this.showFirebase} className={pclass(classes)}>
@@ -220,5 +171,53 @@ module.exports = React.createClass({
         </div>
       </form>
     )
+  },
+
+
+  /**
+   * _renderSelector
+   *
+   * renders either a loading message or a selector
+   */
+
+  _renderSelector: function() {
+    var pclass = this.prefixClass;
+    var cx = React.addons.classSet;
+    var elem;
+
+    var formClasses = cx({
+      'form-fields': true,
+      'l-stacked': true,
+      'form-fields-large': !this.props.isDevTools
+    });
+
+    if (this.state.firebases.length === 0) {
+      elem = (
+        <ul className={pclass(formClasses)}>
+          <li>
+            <label className={pclass('form-select-labels')}>Loading your Firebase apps</label>
+          </li>
+        </ul>
+      );
+    }
+    else {
+      elem = (
+        <div>
+          <ul className={pclass(formClasses)}>
+            <li>
+              <label className={pclass('form-select-labels')} for='firebase-picker'>Select a Firebase app to view:</label>
+              <select className={pclass('form-select-controls')} id='firebase-picker' name='firebase-picker' ref='firebasePicker' onChange={this.updateSelectedFirebase}>
+                {this.state.firebases.map(function(firebase){
+                  return <option value={firebase.namespace}>{firebase.namespace}</option>
+                })}
+              </select>
+            </li>
+          </ul>
+          <input type='submit' value='View Data' className={pclass('button button-large button-primary form-select-controls')} />
+        </div>
+      );
+    }
+
+    return elem;
   },
 });

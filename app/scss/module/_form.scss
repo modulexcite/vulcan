@@ -83,3 +83,20 @@
     margin: 0px auto;
   }
 }
+
+/**
+* SELECT FIREBASE FORM LABELS
+*
+*/
+#{$v}-form-select-labels {
+  text-align: center;
+}
+
+/**
+* SELECT FIREBASE FORM CONTROLS
+*
+*/
+#{$v}-form-select-controls {
+  display: block;
+  margin: 0 auto;
+}

@@ -184,7 +184,10 @@ module.exports = React.createClass({
     var self = this;
 
     // CLEAR ERROR MESSAGES
-    this.setState({loginAuthError: null});
+    this.setState({
+      error: null,
+      loginAuthError: null
+    });
 
     // MAKE LOGIN REQUEST
     $.ajax({

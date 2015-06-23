@@ -27,7 +27,9 @@ module.exports = React.createClass({
     var password = this.props.password || '';
 
     return {
+      emailLabel: 'Email',
       email: email,
+      passwordLabel: 'Password',
       password: password
     };
   },
@@ -90,46 +92,59 @@ module.exports = React.createClass({
     var email = this.refs.email.getDOMNode().value.trim();
     var password = this.refs.password.getDOMNode().value.trim();
     var pclass = this.prefixClass;
+    var emailLabel = 'Email';
+    var passwordLabel = 'Password';
 
-    var emailPasswordValidation = function(email, password) {
-      var errors = {
-        email: undefined,
-        password: undefined
-      };
-
-      // VERY SIMPLE EMAIL / PW CHECK
-      if (email.indexOf('@') === -1) {
-        errors.email = true;
-      }
-      if (password.length === 0) {
-        errors.password = true;
-      }
-
-      return errors;
-    };
-
-    var errors = emailPasswordValidation(email, password);
+    // CHECK THE EMAIL AND PASSWORD ENTERED
+    var errors = this.validateLoginCredentials(email, password);
     var hasErrors = (errors.email || errors.password);
 
     if (hasErrors) {
-
       // DISPLAY ANY ERROR MESSAGES
       if (errors.email) {
-        this.refs.emailLabel.getDOMNode().innerHTML = 'Please enter a valid email address';
-        this.refs.emailLabel.getDOMNode().className = pclass('has-error');
+        emailLabel = 'Please enter a valid email address';
       }
       if (errors.password) {
-        this.refs.passwordLabel.getDOMNode().innerHTML = 'Please enter a password';
-        this.refs.passwordLabel.getDOMNode().className = pclass('has-error');
+        passwordLabel = 'Please enter a password';
       }
-
     }
     else {
+      // LOG IN
       this.props.onLogin({
         email: email,
         password: password
       });
     }
+
+    // UPDATE ERROR LABELS
+    this.setState({
+      emailLabel: emailLabel,
+      passwordLabel: passwordLabel
+    });
+  },
+
+
+  /**
+   * validateLoginCredentials
+   *
+   * very simple form validation
+   */
+
+  validateLoginCredentials: function(email, password) {
+    var errors = {
+      email: undefined,
+      password: undefined
+    };
+
+    // VERY SIMPLE EMAIL / PW CHECK
+    if (email.indexOf('@') === -1) {
+      errors.email = true;
+    }
+    if (password.length === 0) {
+      errors.password = true;
+    }
+
+    return errors;
   },
 
 
@@ -163,7 +178,6 @@ module.exports = React.createClass({
     var pclass = this.prefixClass;
     var cx = React.addons.classSet;
 
-
     //OPTIONS FOR PINNING STATE
     var classes = cx({
       'login-form': true,
@@ -176,6 +190,17 @@ module.exports = React.createClass({
       'form-fields-large': !this.props.isDevTools
     });
 
+    var emailClasses = '';
+    var passwordClasses = '';
+
+    // IF THE LABEL ON THE FIELD ISN'T THE DEFAULT LABEL, IT'S AN ERROR
+    if (this.state.emailLabel !== 'Email') {
+      emailClasses = 'has-error';
+    }
+
+    if (this.state.passwordLabel !== 'Password') {
+      passwordClasses = 'has-error';
+    }
 
     return  (
       <form onSubmit={this.handleSubmit} className={pclass(classes)}>
@@ -185,11 +210,11 @@ module.exports = React.createClass({
 
         <ul className={pclass(formClasses)}>
           <li>
-            <label for="emailField" ref="emailLabel">Email</label>
+            <label for="emailField" ref="emailLabel" className={pclass(emailClasses)}>{this.state.emailLabel}</label>
             <input id="emailField" ref="email" type="text" name="email" defaultValue={this.state.email}/>
           </li>
           <li>
-            <label for="passwordField" ref="passwordLabel">Password</label>
+            <label for="passwordField" ref="passwordLabel" className={pclass(passwordClasses)}>{this.state.passwordLabel}</label>
             <input id="passwordField"  ref="password" type="password" name="password"/>
           </li>
         </ul>
