@@ -8,26 +8,18 @@ module.exports = function(grunt) {
     pkg: grunt.file.readJSON('package.json'),
 
     browserify: {
-      account_dev: {
-        options: {
-          debug: true
-        },
+      production: {
         files: {
-          'production/js/vulcan.js': ['tmp/js/vulcan.js']
+          'production/js/vulcan.js': ['app/js/vulcan.jsx']
+        },
+        options: {
+          transform: ['reactify'],
+          browserifyOptions: {
+            debug: true,
+            extensions: ['.js', '.jsx']
+          }
         }
       }
-    },
-
-    react: {
-      client: {
-        files: [{
-          expand: true,
-          cwd: 'app/js',
-          src: ['**/*.js', '**/*.jsx'],
-          dest: 'tmp/js',
-          ext: '.js'
-        }]
-      },
     },
 
     uglify: {
@@ -139,7 +131,7 @@ module.exports = function(grunt) {
 
       js: {
         files: ['app/js/**/*'],
-        tasks: ['react', 'browserify', 'copy:chrome']
+        tasks: ['browserify', 'copy:chrome']
       },
 
       html: {
@@ -160,8 +152,8 @@ module.exports = function(grunt) {
     }
   });
 
-  grunt.registerTask('build:production', ['sass', 'autoprefixer', 'react', 'browserify', 'uglify', 'copy:html', 'copy:bower', 'copy:images', 'copy:chrome', 'compress', 'clean']);
-  grunt.registerTask('build:development', ['sass', 'autoprefixer', 'react', 'browserify', 'copy:html', 'copy:bower', 'copy:images', 'copy:chrome', 'clean']);
+  grunt.registerTask('build:production', ['sass', 'autoprefixer', 'browserify', 'uglify', 'copy:html', 'copy:bower', 'copy:images', 'copy:chrome', 'compress', 'clean']);
+  grunt.registerTask('build:development', ['sass', 'autoprefixer', 'browserify', 'copy:html', 'copy:bower', 'copy:images', 'copy:chrome', 'clean']);
 
   //DEVELOPMENT FOR WEB PLATFORM
   grunt.registerTask('dev', ['build:development', 'connect', 'watch']);
