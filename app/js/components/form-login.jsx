@@ -115,11 +115,11 @@ module.exports = React.createClass({
 
   renderAuthLabel: function() {
     var pclass = this.prefixClass;
-    var label = <label for="tokenField" ref="tokenLabel">Authentication Token <em>(optional, <a target="_blank" href="https://www.firebase.com/docs/web/guide/simple-login/custom.html">more info</a>)</em></label>
+    var label = <label htmlFor="tokenField" ref="tokenLabel">Authentication Token <em>(optional, <a target="_blank" href="https://www.firebase.com/docs/web/guide/simple-login/custom.html">more info</a>)</em></label>
 
 
     if(this.props.authError) {
-      label = <label for="tokenField" ref="tokenLabel" className={pclass('has-error')}>The Authentication Token is Invalid</label>
+      label = <label htmlFor="tokenField" ref="tokenLabel" className={pclass('has-error')}>The Authentication Token is Invalid</label>
     }
 
     return label;
@@ -159,7 +159,7 @@ module.exports = React.createClass({
 
         <ul className={pclass(formClasses)}>
           <li>
-            <label for="urlField" ref="urlLabel">Firebase URL</label>
+            <label htmlFor="urlField" ref="urlLabel">Firebase URL</label>
             <input id="urlField" ref="url" placeholder="https://yourapp.firebaseio.com" type="text" name="url" defaultValue={this.state.url}/>
           </li>
           <li>
